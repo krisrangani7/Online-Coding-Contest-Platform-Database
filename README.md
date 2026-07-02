@@ -1,4 +1,4 @@
-# 💻 Online Coding Contest Platform — Database Design
+# 💻 Online Coding Contest Platform Database 
 
 This project is a **relational database design** for an Online Coding Contest Platform that helps users participate in programming contests, submit solutions, track scores, and compete on leaderboards. The database includes:
 
