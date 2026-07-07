@@ -150,6 +150,7 @@ Online-Coding-Contest-Platform-Database/
 ├── README.md                       # Project overview and setup instructions
 ├── LICENSE                         # MIT License
 └── .gitignore                      # Git ignore rules
+```
 
 ---
 
