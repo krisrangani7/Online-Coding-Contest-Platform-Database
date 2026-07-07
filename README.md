@@ -150,12 +150,9 @@ Online-Coding-Contest-Platform-Database/
 ├── README.md                       # Project overview and setup instructions
 ├── LICENSE                         # MIT License
 └── .gitignore                      # Git ignore rules
-```
 
 ---
 
 ## 🙋‍♂️ About the Author
 
-Made with ❤️ by **Kris Rangani** and team
-
-🔗 GitHub Profile: https://github.com/KrisRangani
+Made with ❤️ by **Kris Rangani** and team 🔗 GitHub Profile: https://github.com/KrisRangani
