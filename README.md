@@ -120,21 +120,36 @@ This project is useful for:
 
 ## 🗂️ Project Structure
 
-```
-online-coding-contest-db/
-├── schema/
-│   ├── create_tables.sql         # DDL for all 20 tables
-│   └── constraints.sql           # Foreign keys and indexes
-├── seed/
-│   └── seed_data.sql             # Sample data for testing
-├── queries/
-│   └── sample_queries.sql        # Useful SQL queries
-├── diagrams/
-│   └── er_diagram.png            # Entity-Relationship diagram
-└── README.md
-```
+Online-Coding-Contest-Platform-Database/
+├── DDL & DML Scripts/              # SQL scripts for database schema and sample data
+│   ├── Badge.sql
+│   ├── Contest.sql
+│   ├── Contest_Problem.sql
+│   ├── Contest_Registration.sql
+│   ├── Editorial.sql
+│   ├── Language.sql
+│   ├── Leaderboard.sql
+│   ├── Notification.sql
+│   ├── Practice_Submission.sql
+│   ├── Problem.sql
+│   ├── Problem_Statistics.sql
+│   ├── Problem_Tag.sql
+│   ├── Rating_History.sql
+│   ├── Submission.sql
+│   ├── Submission_Result.sql
+│   ├── Tag.sql
+│   ├── TestCase.sql
+│   ├── User.sql
+│   ├── User_Badge.sql
+│   └── Virtual_Contest.sql
+├── ER Diagram.pdf                  # Entity-Relationship diagram
+├── Relational Schema & BCNF.pdf    # Normalized relational schema
+├── System Use Cases.pdf            # System use case diagrams and descriptions
+├── Queries.pdf                     # SQL queries and their outputs
+├── README.md                       # Project overview and setup instructions
+├── LICENSE                         # MIT License
+└── .gitignore                      # Git ignore rules
 
----
 
 ## 🙋‍♂️ About the Author
 
