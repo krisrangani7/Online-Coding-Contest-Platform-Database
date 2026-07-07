@@ -1,0 +1,276 @@
+CREATE TABLE "User" (
+    "user_id" INT PRIMARY KEY,
+    "name" VARCHAR(100) NOT NULL,
+    "email" VARCHAR(100) UNIQUE NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
+    "role" VARCHAR(20) CHECK ("role" IN ('Admin', 'Problem Setter', 'Student')) NOT NULL,
+    "rating" INT DEFAULT 0,
+    "college" VARCHAR(100),
+    "created_at" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE "Language" (
+    "language_id" INT PRIMARY KEY,
+    "language_name" VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE "Tag" (
+    "tag_id" INT PRIMARY KEY,
+    "tag_name" VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE "Badge" (
+    "badge_id" INT PRIMARY KEY,
+    "badge_name" VARCHAR(100) NOT NULL,
+    "description" TEXT,
+    "criteria" VARCHAR(255),
+    "icon" VARCHAR(255),
+    "created_at" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE "Contest" (
+    "contest_id" INT PRIMARY KEY,
+    "title" VARCHAR(100) NOT NULL,
+    "description" TEXT,
+    "start_time" TIMESTAMP NOT NULL,
+    "end_time" TIMESTAMP NOT NULL,
+    "created_by" INT,
+    FOREIGN KEY ("created_by") REFERENCES "User" ("user_id") ON DELETE SET NULL
+);
+
+CREATE TABLE "Problem" (
+    "problem_id" INT PRIMARY KEY,
+    "title" VARCHAR(100) NOT NULL,
+    "statement" TEXT NOT NULL,
+    "difficulty" VARCHAR(10) CHECK ("difficulty" IN ('Easy', 'Medium', 'Hard')) NOT NULL,
+    "time_limit" INT NOT NULL, -- in milliseconds
+    "memory_limit" INT NOT NULL, -- in MB
+    "created_by" INT,
+    FOREIGN KEY ("created_by") REFERENCES "User" ("user_id") ON DELETE SET NULL
+);
+
+CREATE TABLE "Contest_Problem" (
+    "contest_id" INT,
+    "problem_id" INT,
+    "problem_code" CHAR(1) NOT NULL,
+    "points" INT NOT NULL,
+    PRIMARY KEY ("contest_id", "problem_id"),
+    FOREIGN KEY ("contest_id") REFERENCES "Contest" ("contest_id") ON DELETE CASCADE,
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Contest_Registration" (
+    "contest_id" INT NOT NULL,
+    "user_id" INT NOT NULL,
+    "registered_at" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("contest_id", "user_id"),
+    FOREIGN KEY ("contest_id") REFERENCES "Contest" ("contest_id") ON DELETE CASCADE,
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "TestCase" (
+    "testcase_id" INT PRIMARY KEY,
+    "problem_id" INT NOT NULL,
+    "input" TEXT NOT NULL,
+    "expected_output" TEXT NOT NULL,
+    "is_sample" BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Submission" (
+    "submission_id" INT PRIMARY KEY,
+    "user_id" INT NOT NULL,
+    "contest_id" INT,
+    "problem_id" INT NOT NULL,
+    "language_id" INT NOT NULL,
+    "code" TEXT NOT NULL,
+    "verdict" VARCHAR(30) NOT NULL, 
+    "runtime" FLOAT NOT NULL,
+    "memory" FLOAT NOT NULL,
+    "submitted_at" TIMESTAMP NOT NULL,
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE,
+    FOREIGN KEY ("contest_id") REFERENCES "Contest" ("contest_id") ON DELETE SET NULL,
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE,
+    FOREIGN KEY ("language_id") REFERENCES "Language" ("language_id") ON DELETE RESTRICT
+);
+
+CREATE TABLE "Submission_Result" (
+    "submission_id" INT,
+    "testcase_id" INT,
+    "status" VARCHAR(30) NOT NULL,
+    "runtime" FLOAT NOT NULL,
+    PRIMARY KEY ("submission_id", "testcase_id"),
+    FOREIGN KEY ("submission_id") REFERENCES "Submission" ("submission_id") ON DELETE CASCADE,
+    FOREIGN KEY ("testcase_id") REFERENCES "TestCase" ("testcase_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Leaderboard" (
+    "contest_id" INT NOT NULL,
+    "user_id" INT NOT NULL,
+    "solved" INT DEFAULT 0,
+    "penalty" INT DEFAULT 0,
+    "rank" INT NOT NULL,
+    PRIMARY KEY ("contest_id", "user_id"),
+    FOREIGN KEY ("contest_id") REFERENCES "Contest" ("contest_id") ON DELETE CASCADE,
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Problem_Tag" (
+    "problem_id" INT,
+    "tag_id" INT,
+    PRIMARY KEY ("problem_id", "tag_id"),
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE,
+    FOREIGN KEY ("tag_id") REFERENCES "Tag" ("tag_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Editorial" (
+    "problem_id" INT PRIMARY KEY,
+    "content" TEXT NOT NULL,
+    "release_time" TIMESTAMP NOT NULL,
+    "created_by" INT,
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE,
+    FOREIGN KEY ("created_by") REFERENCES "User" ("user_id") ON DELETE SET NULL
+);
+
+CREATE TABLE "Virtual_Contest" (
+    "user_id" INT NOT NULL,
+    "contest_id" INT NOT NULL,
+    "start_time" TIMESTAMP NOT NULL,
+    "end_time" TIMESTAMP NOT NULL,
+    "status" VARCHAR(20) CHECK ("status" IN ('Running', 'Completed')) NOT NULL,
+    "score" INT DEFAULT 0,
+    "rank" INT,
+    PRIMARY KEY ("user_id", "contest_id"),
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE,
+    FOREIGN KEY ("contest_id") REFERENCES "Contest" ("contest_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Rating_History" (
+    "user_id" INT NOT NULL,
+    "contest_id" INT NOT NULL,
+    "old_rating" INT NOT NULL,
+    "new_rating" INT NOT NULL,
+    "rating_change" INT NOT NULL,
+    "updated_at" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("user_id", "contest_id"),
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE,
+    FOREIGN KEY ("contest_id") REFERENCES "Contest" ("contest_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Practice_Submission" (
+    "practice_submission_id" INT PRIMARY KEY,
+    "user_id" INT NOT NULL,
+    "problem_id" INT NOT NULL,
+    "language_id" INT NOT NULL,
+    "code" TEXT NOT NULL,
+    "verdict" VARCHAR(30) NOT NULL,
+    "runtime" FLOAT NOT NULL,
+    "memory" FLOAT NOT NULL,
+    "submitted_at" TIMESTAMP NOT NULL,
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE,
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE,
+    FOREIGN KEY ("language_id") REFERENCES "Language" ("language_id") ON DELETE RESTRICT
+);
+
+CREATE TABLE "Notification" (
+    "notification_id" INT PRIMARY KEY, 
+    "user_id" INT NOT NULL,
+    "title" VARCHAR(100) NOT NULL,
+    "message" TEXT NOT NULL,
+    "is_read" BOOLEAN DEFAULT FALSE,
+    "created_at" TIMESTAMP NOT NULL,
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "User_Badge" (
+    "user_id" INT,
+    "badge_id" INT,
+    "awarded_at" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("user_id", "badge_id"),
+    FOREIGN KEY ("user_id") REFERENCES "User" ("user_id") ON DELETE CASCADE,
+    FOREIGN KEY ("badge_id") REFERENCES "Badge" ("badge_id") ON DELETE CASCADE
+);
+
+CREATE TABLE "Problem_Statistics" (
+    "problem_id" INT PRIMARY KEY,
+    "total_submissions" INT DEFAULT 0,
+    "accepted_submissions" INT DEFAULT 0,
+    "acceptance_rate" DECIMAL(5,2) DEFAULT 0.00,
+    "average_runtime" FLOAT DEFAULT 0.0,
+    "average_memory" FLOAT DEFAULT 0.0,
+    "last_updated" TIMESTAMP NOT NULL,
+    FOREIGN KEY ("problem_id") REFERENCES "Problem" ("problem_id") ON DELETE CASCADE
+);
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--1. Trigger: Update Total Submissions for a Problem
+--This trigger automatically increases the total submission count
+--whenever a new submission is made for a problem.
+
+CREATE OR REPLACE FUNCTION update_total_submissions()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE "Problem_Statistics"
+    SET total_submissions = total_submissions + 1
+    WHERE problem_id = NEW.problem_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER total_submission_trigger
+AFTER INSERT ON "Submission"
+FOR EACH ROW
+EXECUTE FUNCTION update_total_submissions();
+
+--2. Trigger: Update Accepted Submission Count
+--This trigger automatically increases the accepted submission count
+--when a submission gets Accepted.
+
+CREATE OR REPLACE FUNCTION update_accepted_submissions()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.verdict = 'Accepted' THEN
+        UPDATE "Problem_Statistics"
+        SET accepted_submissions = accepted_submissions + 1
+        WHERE problem_id = NEW.problem_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER accepted_submission_trigger
+AFTER INSERT ON "Submission"
+FOR EACH ROW
+EXECUTE FUNCTION update_accepted_submissions();
+
+--3. Trigger: Notify User After Accepted Submission
+--This trigger inserts a notification whenever a user's submission is Accepted.
+
+CREATE OR REPLACE FUNCTION notify_user_after_accept()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.verdict = 'Accepted' THEN
+        INSERT INTO "Notification"
+        (user_id, message, notification_type, created_at, is_read)
+        VALUES
+        (
+            NEW.user_id,
+            'Congratulations! Your solution has been Accepted.',
+            'Submission',
+            CURRENT_TIMESTAMP,
+            FALSE
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER accepted_notification_trigger
+AFTER INSERT ON "Submission"
+FOR EACH ROW
+EXECUTE FUNCTION notify_user_after_accept()
